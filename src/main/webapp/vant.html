@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>vant演示页面</title>
+    <!--    基于设备逻辑分辨率进行页面开发，禁止页面缩放-->
+    <meta name="viewport" content="width=device-width,initial-scale=1.0, maximum-scale=1.0,user-scalable=no">
+    <link rel="stylesheet" href="/assets/vant/index.css">
+    <script src="assets/vue/vue.global.js"></script>
+    <script src="assets/vant/vant.min.js"></script>
+</head>
+<body>
+<div id="app">
+
+</div>
+<script>
+    const main = {
+        data() {
+            return {}
+        }
+    }
+    const app = Vue.createApp(main);
+    app.use(vant);
+    app.use(vant.Lazyload);
+    app.mount("#app");
+</script>
+</body>
+</html>
