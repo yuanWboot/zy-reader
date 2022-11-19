@@ -90,18 +90,22 @@
         </template>
     </van-nav-bar>
     <!--短评列表,通过迭代EvaluationList实现-->
-    <template v-for="evaluation , index in evaluationList">
-    <div style="border-bottom: 1px solid #cccccc">
-        <div style="padding: 10px;">
-            <span style="margin-right: 20px">{{evaluation.ct}}</span>
-            <span style="margin-right: 20px">{{evaluation.nickname}}</span>
-            <van-rate v-model="evaluation.score" color="#ffd21e" void-icon="star" readonly allow-half></van-rate>
-            <van-button icon="like-o" @click="enjoy(index)" type="success" size="small" style="width:40px;float:right" >{{evaluation.enjoy}}</van-button>
+    <template v-for="evaluation,index in evaluationList">
+        <div style="border-bottom: 1px solid #cccccc">
+            <div style="padding: 10px;">
+                <!-- 短评创建时间 -->
+                <span style="margin-right: 20px">{{evaluation.ct}}</span>
+                <!-- 用户昵称 -->
+                <span style="margin-right: 20px">{{evaluation.nickname}}</span>
+                <!-- 星型分数 -->
+                <van-rate v-model="evaluation.score" color="#ffd21e" void-icon="star" readonly allow-half></van-rate>
+                <van-button icon="like-o" @click="enjoy(index)" type="success" size="small" style="width:40px;float:right" >{{evaluation.enjoy}}</van-button>
+            </div>
+            <!-- 评论内容 -->
+            <div style="padding: 10px;">
+                {{evaluation.content}}
+            </div>
         </div>
-        <div style="padding: 10px;">
-            {{evaluation.content}}
-        </div>
-    </div>
     </template>
     <div style="margin-bottom: 50px">
     </div>
@@ -149,9 +153,9 @@
             confirmButtonText: "去登录",
             cancelButtonText: "关闭"
         })
-        .then(() => {
-            window.location.href = "/login.html";
-        })
+            .then(() => {
+                window.location.href = "/login.html";
+            })
     }
 
     const main = {
@@ -163,7 +167,7 @@
                     readState : -1, //当前会员阅读状态 -1:无数据 1:想看 2:看过
                     dialogVisible : false //短评对话框是否显示
                 },
-                book: { 
+                book: {
                 },
                 evaluationList:[], //短评列表
                 form: { //短评表单数据
@@ -173,14 +177,14 @@
             }
         }
         , methods: {
-            showEvaluationList: function (bookId,isFlush){
+            showEvaluationList: function(bookId,isFlush){
                 const objApp = this;
                 axios.get("/api/evaluation/list?bookId=" + bookId)
                     .then(function(response){
                         const json = response.data;
                         if(json.code == "0"){
-                            if (isFlush){
-                                objApp.evaluationList.splice(0,objApp.showEvaluationList.length);
+                            if(isFlush){
+                                objApp.evaluationList.splice(0, objApp.evaluationList.length);
                             }
                             const list = json.data.list;
                             list.forEach(function(item){
@@ -212,49 +216,50 @@
                 const memberId = sessionStorage.mid;
                 const bookId = getQueryString("bid");
                 const objApp = this;
-                if (!objApp.state.isLogin){
+                if(!objApp.state.isLogin){
                     warnLogin("登录后才能更新阅读状态哦");
                     return;
                 }
                 const params = new URLSearchParams();
-                params.append("memberId",memberId);
-                params.append("bookId",bookId);
-                params.append("readState",readState);
+                params.append("memberId", memberId);
+                params.append("bookId", bookId);
+                params.append("readState", readState);
                 axios.post("/api/member/update_read_state",params)
-                .then(function (response){
-                    const json = response.data;
-                    if (json.code == "0"){
-                        objApp.state.readState = json.data.readState.readState;
-                    }else {
-                        console.error(json);
-                    }
-                })
+                    .then(function(response){
+                        const json = response.data;
+                        if(json.code == "0"){
+                            objApp.state.readState = json.data.readState.readState;
+                        }else{
+                            console.error(json);
+                        }
+                    })
+
             }
             ,onSubmit: function (formName) {
                 //提交短评功能
                 const form = this.$refs[formName];
-                const  objApp = this;
+                const objApp = this;
                 const memberId = sessionStorage.mid;
                 const bookId = getQueryString("bid");
-                form.validate().then(function (){
+                form.validate().then(function(){
                     const params = new URLSearchParams();
-                    params.append("memberId",memberId);
-                    params.append("bookId",bookId);
-                    params.append("score",objApp.form.score);
-                    params.append("content",objApp.form.content);
-                    axios.post("/api/member/evaluate",params)
-                    .then(function (response){
-                        const json = response.data;
-                        if (json.code == "0"){
-                            objApp.state.dialogVisible = false;
-                            objApp.form.score = 5;
-                            objApp.form.content = "";
-                            objApp.showEvaluationList(bookId,true);
-                        }else {
-                            console.error(json);
-                        }
-                    })
-                })
+                    params.append("memberId", memberId);
+                    params.append("bookId", bookId);
+                    params.append("score", objApp.form.score);
+                    params.append("content", objApp.form.content);
+                    axios.post("/api/member/evaluate" , params)
+                        .then(function(response){
+                            const json = response.data;
+                            if(json.code == "0"){
+                                objApp.state.dialogVisible = false;
+                                objApp.form.score = 5;
+                                objApp.form.content = "";
+                                objApp.showEvaluationList(bookId , true);
+                            }else{
+                                console.error(json);
+                            }
+                        })
+                }).catch(function(e){console.debug("表单验证失败",e)});
             }
             ,enjoy : function(index){
                 //点赞功能
@@ -262,46 +267,47 @@
         }
         , mounted() {
             //初始化后数据操作
-           const bookId = getQueryString("bid");
-           const objApp = this;
-           const uri = "/api/book/id/"+bookId;
-           axios.get(uri).then(function (response){
-               const json = response.data;
-               if(json.code == "0"){
-                  objApp.book = json.data.book;
-               }else {
-                   console.error(json);
-               }
-           });
-           objApp.showEvaluationList(bookId,false);
+            const bookId = getQueryString("bid");
+            const objApp = this;
+            const uri = "/api/book/id/" + bookId;
+            axios.get(uri).then(function(response){
+                const json = response.data;
+                if(json.code == "0"){
+                    objApp.book = json.data.book;
+                }else{
+                    console.error(json);
+                }
+            });
+            objApp.showEvaluationList(bookId , false);
             const mid = sessionStorage.mid;
-            if (mid != null){
+            if(mid != null){
                 axios.get("/api/member/select_by_id?memberId=" + mid)
-                .then(function (response){
-                    const json = response.data;
-                    if (json.code == "0"){
-                        objApp.state.isLogin = true;
-                        objApp.state.member = json.data.member;
-                    }else {
-                        console.error(json);
-                    }
-                })
-                axios.get("/api/member/select_read_state?memberId="+mid+"&bookId="+bookId)
-                .then(function (response){
-                    const json = response.data;
-                    if (json.code == "0"){
-                        if (json.data.readState != null){
-                            objApp.state.readState = json.data.readState.readState;
-                        }else {
-                            objApp.state.readState = -1;
-                    }
-                    }else {
-                        console.error(json);
-                    }
-                })
+                    .then(function(response){
+                        const json = response.data;
+                        if(json.code == "0"){
+                            objApp.state.isLogin = true;
+                            objApp.state.member = json.data.member;
+                        }else{
+                            console.error(json);
+                        }
+                    })
+                axios.get("/api/member/select_read_state?memberId=" + mid + "&bookId=" + bookId)
+                    .then(function (response){
+                        const json = response.data;
+                        if(json.code == "0"){
+                            if(json.data.readState != null){
+                                objApp.state.readState = json.data.readState.readState;
+                            }else{
+                                objApp.state.readState = -1;
+                            }
+                        }else{
+                            console.error(json);
+                        }
+                    })
             }
+
+
         }
-      
     };
     const app = Vue.createApp(main);
     app.use(vant);
