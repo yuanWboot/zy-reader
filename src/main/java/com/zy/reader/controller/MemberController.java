@@ -1,7 +1,9 @@
 package com.zy.reader.controller;
 
+import com.zy.reader.entity.Evaluation;
 import com.zy.reader.entity.Member;
 import com.zy.reader.entity.MemberReadState;
+import com.zy.reader.service.EvaluationService;
 import com.zy.reader.service.MemberService;
 import com.zy.reader.utils.ResponseUtils;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,6 +19,8 @@ import javax.servlet.http.HttpServletRequest;
 public class MemberController {
     @Resource
     private MemberService memberService;
+    @Resource
+    private EvaluationService evaluationService;
 
     @PostMapping("/register")
     public ResponseUtils register(String username, String password, String nickname,
@@ -97,6 +101,18 @@ public class MemberController {
         }catch (Exception e){
             e.printStackTrace();
             resp = new ResponseUtils(e.getClass().getSimpleName(), e.getMessage());
+        }
+        return  resp;
+    }
+    @PostMapping("/evaluate")
+    public ResponseUtils evaluate(Long memberId,Long bookId,Integer score,String content){
+        ResponseUtils resp = null;
+        try{
+            Evaluation evaluation = evaluationService.evaluate(memberId, bookId, score, content);
+            resp = new ResponseUtils().put("evaluation",evaluation);
+        }catch (Exception e){
+            e.printStackTrace();
+            resp = new ResponseUtils(e.getClass().getSimpleName(),e.getMessage());
         }
         return  resp;
     }

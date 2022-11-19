@@ -9,7 +9,7 @@ import java.util.Date;
 public class Evaluation {
     @TableId(type = IdType.AUTO)
     private Long evaluationId  ;
-    private String context ;
+    private String content ;
     private Integer score  ;
     private Date createTime;
     private Long memberId  ;
@@ -27,12 +27,12 @@ public class Evaluation {
         this.evaluationId = evaluationId;
     }
 
-    public String getContext() {
-        return context;
+    public String getContent() {
+        return content;
     }
 
-    public void setContext(String context) {
-        this.context = context;
+    public void setContent(String content) {
+        this.content = content;
     }
 
     public Integer getScore() {
