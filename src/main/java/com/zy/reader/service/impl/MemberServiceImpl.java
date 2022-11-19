@@ -39,6 +39,7 @@ public class MemberServiceImpl implements MemberService {
         member.setSalt(salt);
         String md5 = Md5Utils.md5Digest(password, salt);
         member.setPassword(md5);
+        memberMapper.insert(member);
         return member;
     }
 }

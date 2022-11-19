@@ -1,5 +1,6 @@
 package com.zy.reader.service;
 
+import com.zy.reader.entity.Member;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -18,11 +19,13 @@ public class MemberServiceTest {
     //用户已存在的情况
     @Test
     public void createMember1() {
-        memberService.createMember("imooc_1","123456","imooc_1");
+        Member member = memberService.createMember("imooc_1", "123456", "imooc_1");
+        System.out.println(member);
     }
     //用户未存在的情况
     @Test
     public void createMember2() {
-        memberService.createMember("imooc_666","123456","imooc_666");
+        Member member = memberService.createMember("imooc_666", "123456", "imooc_666");
+        System.out.println(member);
     }
 }
