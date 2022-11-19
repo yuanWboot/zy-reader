@@ -9,6 +9,7 @@ import com.zy.reader.utils.Md5Utils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PostMapping;
 
 import javax.annotation.Resource;
 import java.util.Date;
@@ -41,5 +42,28 @@ public class MemberServiceImpl implements MemberService {
         member.setPassword(md5);
         memberMapper.insert(member);
         return member;
+    }
+
+   
+    @Override
+    public Member checkLogin(String username, String password) {
+        QueryWrapper<Member> wrapper = new QueryWrapper<>();
+        wrapper.eq("username",username);
+        Member member = memberMapper.selectOne(wrapper);
+        if (member == null ){
+            throw new MemberException("用户不存在");
+        }
+        String md5 = Md5Utils.md5Digest(password, member.getSalt());
+        if (!md5.equals(member.getPassword())){
+            throw new MemberException("您输入的密码有误");
+        }
+        
+        return member;
+    }
+
+    @Override
+    public Member selectById(Long memberId) {
+        
+        return memberMapper.selectById(memberId);
     }
 }

@@ -15,17 +15,15 @@
 </head>
 <body>
 <div id="app">
-    <van-nav-bar right-text="会员登录" @click-right="directLogin">
+    <van-nav-bar right-text="会员注册" @click-right="directRegister">
         <template #left>
             <a href="/" style="padding-top: 10px">
                 <img src="/images/logo2.png" style="width: 80px">
             </a>
         </template>
     </van-nav-bar>
-    <h3 style="padding-left:32px">会员注册</h3>
-    <!-- 注册表单 -->
-    <van-form ref="registerForm">
-        <!--用户名-->
+    <h3 style="padding-left:32px">会员登录</h3>
+    <van-form ref="loginForm">
         <van-cell-group inset>
             <van-field
                     v-model="username"
@@ -36,7 +34,6 @@
                     :rules="[{ required: true, message: '请填写用户名' }]"
             />
         </van-cell-group>
-        <!--密码-->
         <van-cell-group inset>
             <van-field
                     v-model="password"
@@ -47,18 +44,6 @@
                     :rules="[{ required: true, message: '请填写密码' }]"
             />
         </van-cell-group>
-        <!--昵称-->
-        <van-cell-group inset>
-            <van-field
-                    v-model="nickname"
-                    name="nickname"
-                    label="昵称"
-                    autocomplete="off"
-                    placeholder="请输入昵称"
-                    :rules="[{ required: true, message: '请填写昵称' }]"
-            />
-        </van-cell-group>
-        <!--验证码-->
         <van-cell-group inset>
             <van-row>
                 <van-col span="16">
@@ -78,8 +63,8 @@
             </van-row>
         </van-cell-group>
         <div style="margin: 16px;">
-            <van-button round block type="primary" @click="onSubmit('registerForm')">
-                注册会员
+            <van-button round block type="primary" @click="onSubmit('loginForm')">
+                登录
             </van-button>
         </div>
     </van-form>
@@ -89,63 +74,46 @@
     const Main = {
         data() {
             return {
-                username: "", //用户名
-                password: "", //密码
-                nickname:"", //昵称
-                verifyCode: "" //验证码
+                username: "",
+                password: "",
+                verifyCode: ""
             }
         }
         , methods: {
-            //注册表单提交方法
             onSubmit: function (formName) {
-                //提取表单对象
                 const form = this.$refs[formName];
-                //定义objApp
-               const objApp = this;
-               //发起请求前使用validate方法对表单校验，非空判断
-               form.validate()
-                   //校验成功，发起post请求
-                .then(function (response){
-                    //组织参数
-                    const params  = new URLSearchParams();
+                const objApp = this;
+                form.validate().then(function(){
+                    //这里组织表单验证后登录代码
+                    const params = new URLSearchParams();
                     params.append("username",objApp.username);
                     params.append("password",objApp.password);
-                    params.append("nickname",objApp.nickname);
                     params.append("vc",objApp.verifyCode);
-                    //发起post请求
-                    axios.post("/api/member/register",params)
+                    axios.post("/api/member/check_login",params)
                     .then(function (response){
                         const json = response.data;
                         if (json.code == "0"){
-                            vant.Dialog.alert({
-                                title: "会员注册成功",
-                                message: "确定后跳转到登录页面"
-                            }).then(function (){
-                                window.location.href = "/login.html";
-                            })
-                        
+                            sessionStorage.mid = json.data.member.memberId;
+                            window.location = "/index.html";
                         }else{
-                            //console.error(json);
                             objApp.reloadVerifyCode();
                             vant.Dialog.alert({
-                                title: "会员注册失败",
+                                title: "登录失败",
                                 message: json.message
                             })
                         }
                     })
-                })
-                   //校验失败
-                .catch(function (e){
-                    console.error(e);
-                })
-
+                }).catch(function(e){console.debug("表单验证失败",e)});
             }
-            , directLogin: function () { //跳转到登录页方法
-                window.location.href = "/login.html";
+            , directRegister: function () {
+                window.location.href = '/register.html';
             }
-            , reloadVerifyCode: function () { //刷新验证码方案
+            , reloadVerifyCode: function () {
                 document.getElementById("imgVerifyCode").src = "/api/verify_code?ts=" + new Date().getTime();
             }
+        }
+        , mounted() {
+
         }
     };
     const app = Vue.createApp(Main);

@@ -28,4 +28,24 @@ public class MemberServiceTest {
         Member member = memberService.createMember("imooc_666", "123456", "imooc_666");
         System.out.println(member);
     }
+
+    //模拟用户名均正确
+    @Test
+    public void checkLogin1() {
+        Member member = memberService.checkLogin("imooc_1", "123456");
+        System.out.println(member);
+    }
+
+    //模拟用户不存在
+    @Test
+    public void checkLogin2() {
+        Member member = memberService.checkLogin("imooc_1k", "123456");
+        System.out.println(member);
+    }
+    //模拟密码不正确
+    @Test
+    public void checkLogin3() {
+        Member member = memberService.checkLogin("imooc_1", "12‘’3456");
+        System.out.println(member);
+    }
 }
