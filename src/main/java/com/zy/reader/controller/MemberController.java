@@ -1,6 +1,7 @@
 package com.zy.reader.controller;
 
 import com.zy.reader.entity.Member;
+import com.zy.reader.entity.MemberReadState;
 import com.zy.reader.service.MemberService;
 import com.zy.reader.utils.ResponseUtils;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -67,6 +68,32 @@ public class MemberController {
         try{
             Member member = memberService.selectById(memberId);
             resp = new ResponseUtils().put("member",member);
+        }catch (Exception e){
+            e.printStackTrace();
+            resp = new ResponseUtils(e.getClass().getSimpleName(), e.getMessage());
+        }
+        return  resp;
+    }
+    
+    @GetMapping("/select_read_state")
+    public  ResponseUtils selectMemberReadState(Long memberId,Long bookId){
+        ResponseUtils resp = null;
+        try{
+            MemberReadState memberReadState = memberService.selectMemberReadState(memberId, bookId);
+            resp = new ResponseUtils().put("readState",memberReadState);
+        }catch (Exception e){
+            e.printStackTrace();
+            resp = new ResponseUtils(e.getClass().getSimpleName(), e.getMessage());
+        }
+        return  resp;
+    }
+    
+    @PostMapping("/update_read_state")
+    public ResponseUtils updateReadState(Long memberId,Long bookId,Integer readState){
+        ResponseUtils resp = null;
+        try{
+            MemberReadState memberReadState = memberService.updateMemberReadState(memberId, bookId, readState);
+            resp = new ResponseUtils().put("readState",memberReadState);
         }catch (Exception e){
             e.printStackTrace();
             resp = new ResponseUtils(e.getClass().getSimpleName(), e.getMessage());

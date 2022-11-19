@@ -2,7 +2,9 @@ package com.zy.reader.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.zy.reader.entity.Member;
+import com.zy.reader.entity.MemberReadState;
 import com.zy.reader.mapper.MemberMapper;
+import com.zy.reader.mapper.MemberReadStateMapper;
 import com.zy.reader.service.MemberService;
 import com.zy.reader.service.excption.MemberException;
 import com.zy.reader.utils.Md5Utils;
@@ -21,6 +23,9 @@ import java.util.Random;
 public class MemberServiceImpl implements MemberService {
     @Resource
     private MemberMapper memberMapper;
+    
+    @Resource
+    private MemberReadStateMapper memberReadStateMapper;
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Member createMember(String username, String password, String nickname) {
@@ -65,5 +70,38 @@ public class MemberServiceImpl implements MemberService {
     public Member selectById(Long memberId) {
         
         return memberMapper.selectById(memberId);
+    }
+
+    @Override
+    public MemberReadState selectMemberReadState(Long memberId, Long bookId) {
+        QueryWrapper<MemberReadState> wrapper = new QueryWrapper<>();
+        wrapper.eq("book_id",bookId);
+        wrapper.eq("member_id",memberId);
+        MemberReadState memberReadState = memberReadStateMapper.selectOne(wrapper);
+        return memberReadState;
+    }
+
+    @Override
+    public MemberReadState updateMemberReadState(Long memberId, Long bookId, Integer readState) {
+       QueryWrapper<MemberReadState> wrapper = new QueryWrapper<>();
+        wrapper.eq("book_id",bookId);
+       wrapper.eq("member_id",memberId);
+      
+        MemberReadState memberReadState = memberReadStateMapper.selectOne(wrapper);
+        if (memberReadState == null){
+            //查询结果为空说明还没有记录，需要创建数据，为字段设置值
+            memberReadState = new MemberReadState();
+            memberReadState.setMemberId(memberId);
+            memberReadState.setBookId(bookId);
+            memberReadState.setReadState(readState);
+            memberReadState.setCreateTime(new Date());
+            memberReadStateMapper.insert(memberReadState);
+        }else {
+            //有数据执行更新操作
+            memberReadState.setReadState(readState);
+            memberReadState.setCreateTime(new Date());
+            memberReadStateMapper.updateById(memberReadState);
+        }
+        return memberReadState;
     }
 }
