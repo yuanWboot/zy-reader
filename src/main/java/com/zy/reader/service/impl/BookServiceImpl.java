@@ -11,30 +11,32 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.Map;
 
 @Service
-@Transactional(propagation = Propagation.NOT_SUPPORTED,readOnly = true)
+@Transactional(propagation = Propagation.NOT_SUPPORTED, readOnly = true)
 public class BookServiceImpl implements BookService {
     @Resource
     private BookMapper bookMapper;
-    @Override         
+
+    @Override
     public IPage<Book> selectPage(Long categoryId, String order, Integer page, Integer rows) {
-        IPage<Book> p = new Page<>(page,rows);
+        IPage<Book> p = new Page<>(page, rows);
         QueryWrapper<Book> wrapper = new QueryWrapper<>();
-        if(categoryId != null && categoryId != -1){
+        if (categoryId != null && categoryId != -1) {
             wrapper.eq("category_id", categoryId);
         }
-        if(order != null){
-            if(order.equals("quantity")){
+        if (order != null) {
+            if (order.equals("quantity")) {
                 wrapper.orderByDesc("evaluation_quantity");
-            }else if(order.equals("score")){
+            } else if (order.equals("score")) {
                 wrapper.orderByDesc("evaluation_score");
             }
-        }else{
+        } else {
             wrapper.orderByDesc("evaluation_quantity");
         }
         p = bookMapper.selectPage(p, wrapper);
-        return p; 
+        return p;
     }
 
     @Override
@@ -46,5 +48,12 @@ public class BookServiceImpl implements BookService {
     @Transactional(rollbackFor = Exception.class)
     public void updateScore() {
         bookMapper.updateScore();
+    }
+
+    @Override
+    public IPage<Map> selectBookMap(Integer page, Integer rows) {
+        IPage p = new Page(page, rows);
+        p = bookMapper.selectBookMap(p);
+        return p;
     }
 }
