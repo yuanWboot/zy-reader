@@ -4,7 +4,7 @@
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:mv="http://www.springframework.org/schema/mvc"
-       xmlns:tx="http://www.springframework.org/schema/tx" 
+       xmlns:tx="http://www.springframework.org/schema/tx"
        xmlns:task="http://www.springframework.org/schema/task"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
             http://www.springframework.org/schema/beans/spring-beans.xsd
@@ -91,5 +91,10 @@
             </bean>
         </property>
     </bean>
+    <!--启用注解形式的定时任务功能    -->
     <task:annotation-driven/>
+    <!--启用spring MVC文件上传功能    -->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="defaultEncoding" value="UTF-8"></property>
+    </bean>
 </beans>
